@@ -26,10 +26,6 @@ import java.util.List;
  *   <li>Transform repository responses into domain objects</li>
  *   <li>Handle error cases with appropriate exceptions</li>
  * </ul>
- *
- * @author Software ULPGC
- * @version 1.0
- * @since 1.0
  */
 public class LoadCurrenciesUseCase implements GetCurrenciesQuery {
 

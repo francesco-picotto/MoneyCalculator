@@ -26,10 +26,6 @@ import software.ulpgc.moneycalculator.domain.model.ExchangeRate;
  *       fallback mechanisms</li>
  *   <li><strong>Mock Provider:</strong> Return fixed rates for testing purposes</li>
  * </ul>
- *
- * @author Software ULPGC
- * @version 1.0
- * @since 1.0
  */
 public interface ExchangeRateProvider {
 

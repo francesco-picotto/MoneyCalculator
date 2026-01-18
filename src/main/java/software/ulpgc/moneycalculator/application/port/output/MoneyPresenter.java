@@ -20,10 +20,6 @@ import software.ulpgc.moneycalculator.domain.model.Money;
  * presenter is responsible for formatting and displaying data without containing
  * business logic. The application layer calls these methods, and the UI layer
  * implements them to render the information appropriately.</p>
- *
- * @author Software ULPGC
- * @version 1.0
- * @since 1.0
  */
 public interface MoneyPresenter {
 

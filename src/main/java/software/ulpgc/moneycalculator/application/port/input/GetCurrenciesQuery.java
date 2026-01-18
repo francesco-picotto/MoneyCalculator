@@ -15,10 +15,7 @@ import java.util.List;
  * in the application layer and invoked by external adapters (e.g., UI controllers,
  * REST API endpoints). The application core implements this interface to provide
  * currency query functionality.</p>
- *
- * @author Software ULPGC
- * @version 1.0
- * @since 1.0
+
  */
 public interface GetCurrenciesQuery {
 

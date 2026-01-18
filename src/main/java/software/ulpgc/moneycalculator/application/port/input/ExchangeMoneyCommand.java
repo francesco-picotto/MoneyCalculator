@@ -31,10 +31,6 @@ import software.ulpgc.moneycalculator.domain.model.Money;
  * <p>By depending on this interface rather than concrete implementations, the
  * UI layer remains decoupled from business logic and can be easily tested with
  * mock implementations.</p>
- *
- * @author Software ULPGC
- * @version 1.0
- * @since 1.0
  */
 public interface ExchangeMoneyCommand {
 

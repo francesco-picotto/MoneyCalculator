@@ -15,10 +15,6 @@ import java.util.Optional;
  *
  * <p>The application core depends on this abstraction rather than concrete
  * implementations, ensuring independence from specific infrastructure concerns.</p>
- *
- * @author Software ULPGC
- * @version 1.0
- * @since 1.0
  */
 public interface CurrencyRepository {
 

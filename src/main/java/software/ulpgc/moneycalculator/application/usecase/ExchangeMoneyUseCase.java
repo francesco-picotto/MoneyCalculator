@@ -32,10 +32,6 @@ import software.ulpgc.moneycalculator.domain.model.Money;
  * <p>This use case implements comprehensive error handling, catching specific
  * exceptions and presenting user-friendly error messages through the presenter.
  * It ensures that all failure scenarios are gracefully communicated to the user.</p>
- *
- * @author Software ULPGC
- * @version 1.0
- * @since 1.0
  */
 public class ExchangeMoneyUseCase implements ExchangeMoneyCommand {
 

@@ -4,14 +4,241 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- ============================================ -->
+    <!-- PROJECT COORDINATES                          -->
+    <!-- ============================================ -->
     <groupId>org.example</groupId>
     <artifactId>MoneyCalculator</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
+    <!-- ============================================ -->
+    <!-- PROJECT METADATA                             -->
+    <!-- ============================================ -->
+    <name>Money Calculator</name>
+    <description>
+        Currency conversion application built with Hexagonal Architecture.
+        Supports real-time exchange rates from ExchangeRate-API, multiple currencies,
+        and clean separation of concerns following DDD principles.
+    </description>
+
+    <!-- ============================================ -->
+    <!-- PROPERTIES                                   -->
+    <!-- ============================================ -->
     <properties>
+        <!-- Java Version - Using Java 23 as per original -->
         <maven.compiler.source>23</maven.compiler.source>
         <maven.compiler.target>23</maven.compiler.target>
+
+        <!-- Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Dependency Versions -->
+        <gson.version>2.10.1</gson.version>
+        <junit.version>5.10.1</junit.version>
+        <mockito.version>5.8.0</mockito.version>
+        <assertj.version>3.25.1</assertj.version>
+
+        <!-- Plugin Versions -->
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.2.3</maven-surefire-plugin.version>
+        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+        <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
     </properties>
+
+    <!-- ============================================ -->
+    <!-- DEPENDENCIES                                 -->
+    <!-- ============================================ -->
+    <dependencies>
+
+        <!-- ===================================== -->
+        <!-- JSON Processing                       -->
+        <!-- ===================================== -->
+
+        <!-- Google Gson - JSON parsing library -->
+        <!-- Used by: GsonJsonParser for parsing ExchangeRate-API responses -->
+        <!-- Purpose: Deserialize JSON to Map/List and custom objects -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+        </dependency>
+
+        <!-- ===================================== -->
+        <!-- Testing Dependencies                  -->
+        <!-- ===================================== -->
+
+        <!-- JUnit 5 (Jupiter) - Modern testing framework -->
+        <!-- Used for: All unit and integration tests -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JUnit 5 Engine - Required to run tests -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JUnit 5 Parameterized Tests -->
+        <!-- Used for: Data-driven tests (testing multiple currencies, amounts, etc.) -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito - Mocking framework for unit tests -->
+        <!-- Used for: Mocking HttpClient, ExchangeRateProvider, CurrencyRepository -->
+        <!-- Purpose: Isolate units under test from external dependencies -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito JUnit 5 Extension -->
+        <!-- Provides @Mock, @InjectMocks annotations for JUnit 5 -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- AssertJ - Fluent assertions library -->
+        <!-- Provides more readable test assertions than plain JUnit -->
+        <!-- Example: assertThat(money.amount()).isEqualTo(100.0) -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <!-- ============================================ -->
+    <!-- BUILD CONFIGURATION                          -->
+    <!-- ============================================ -->
+    <build>
+        <plugins>
+
+            <!-- ================================== -->
+            <!-- Compiler Plugin                    -->
+            <!-- ================================== -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <!-- Enable all compiler warnings for code quality -->
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                        <arg>-Xlint:-serial</arg> <!-- Suppress serialization warnings -->
+                    </compilerArgs>
+                    <!-- Show deprecation warnings -->
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+
+            <!-- ================================== -->
+            <!-- Surefire Plugin - Unit Tests       -->
+            <!-- ================================== -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <!-- Run tests in parallel for faster execution -->
+                    <parallel>methods</parallel>
+                    <threadCount>4</threadCount>
+                    <!-- Include all test classes -->
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*Tests.java</include>
+                    </includes>
+                    <!-- Print test results to console -->
+                    <trimStackTrace>false</trimStackTrace>
+                </configuration>
+            </plugin>
+
+            <!-- ================================== -->
+            <!-- JAR Plugin - Build Configuration   -->
+            <!-- ================================== -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <!-- Specify main class for executable JAR -->
+                            <!-- Update this to your actual main class path -->
+                            <mainClass>software.ulpgc.moneycalculator.Main</mainClass>
+                            <!-- Add classpath entries to manifest -->
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                        <manifestEntries>
+                            <!-- Additional manifest entries -->
+                            <Built-By>${user.name}</Built-By>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                            <Implementation-Title>${project.artifactId}</Implementation-Title>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- ================================== -->
+            <!-- Assembly Plugin - Fat JAR          -->
+            <!-- Creates executable JAR with deps   -->
+            <!-- ================================== -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <!-- Main class for executable fat JAR -->
+                            <mainClass>software.ulpgc.moneycalculator.Main</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <!-- Create JAR with all dependencies included -->
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <!-- Output file naming -->
+                    <finalName>${project.artifactId}-${project.version}</finalName>
+                    <appendAssemblyId>true</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
 
 </project>
