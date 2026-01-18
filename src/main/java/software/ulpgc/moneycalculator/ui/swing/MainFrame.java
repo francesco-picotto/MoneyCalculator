@@ -12,34 +12,67 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * MainFrame è la finestra principale dell'applicazione Money Calculator.
+ * Main application window for the Money Calculator.
  *
- * RESPONSABILITÀ:
- * - Crea e organizza tutti i componenti grafici (dialog e display)
- * - Gestisce il layout dell'interfaccia utente
- * - Contiene i pulsanti per eseguire i comandi
- * - Coordina l'interazione tra i vari componenti
+ * <p>This class serves as the primary container and coordinator for all UI components
+ * in the application. It manages the layout, user interactions, and command execution.</p>
  *
- * PATTERN UTILIZZATI:
- * - MVC: Questa è la Vista principale
- * - Command: Memorizza i comandi da eseguire quando l'utente interagisce
+ * <p><strong>Responsibilities:</strong></p>
+ * <ul>
+ *   <li>Creating and organizing all visual components (dialogs and displays)</li>
+ *   <li>Managing the overall window layout and appearance</li>
+ *   <li>Coordinating user interactions with command handlers</li>
+ *   <li>Providing keyboard shortcuts for improved usability</li>
+ * </ul>
  *
- * IMPROVEMENTS:
- * - Added swap button to reverse currencies
- * - Added keyboard shortcut (Ctrl+Enter) for conversion
- * - Better button layout
- * - Error handling improvements
+ * <p><strong>Architecture & Patterns:</strong></p>
+ * <ul>
+ *   <li><strong>MVC Pattern:</strong> Acts as the main View component</li>
+ *   <li><strong>Command Pattern:</strong> Stores and executes commands triggered by user actions</li>
+ *   <li><strong>Mediator Pattern:</strong> Coordinates interactions between child components</li>
+ * </ul>
+ *
+ * <p><strong>UI Components:</strong></p>
+ * <ul>
+ *   <li>{@link SwingMoneyDialog}: Input for source amount and currency</li>
+ *   <li>{@link SwingCurrencyDialog}: Selection for target currency</li>
+ *   <li>{@link SwingMoneyDisplay}: Display for conversion results</li>
+ * </ul>
+ *
+ * <p><strong>Keyboard Shortcuts:</strong></p>
+ * <ul>
+ *   <li><kbd>Ctrl+Enter</kbd>: Execute currency conversion</li>
+ * </ul>
+ *
+ * @author Money Calculator Team
+ * @version 2.0
+ * @since 1.0
+ * @see SwingMoneyDialog
+ * @see SwingCurrencyDialog
+ * @see SwingMoneyDisplay
  */
 public class MainFrame extends JFrame {
+
+    /** Registry of commands mapped by name for dynamic execution */
     private final Map<String, Command> commands;
+
+    /** Dialog for entering the source money (amount + currency) */
     private SwingMoneyDialog moneyDialog;
+
+    /** Dialog for selecting the target currency */
     private SwingCurrencyDialog currencyDialog;
+
+    /** Display component for showing conversion results */
     private SwingMoneyDisplay moneyDisplay;
+
+    /** Button to trigger currency conversion */
     private JButton convertButton;
 
     /**
-     * Costruttore del MainFrame
-     * Inizializza la mappa dei comandi (sarà popolata dopo con put())
+     * Constructs the main application frame.
+     *
+     * <p>Initializes the command registry and sets up all UI components,
+     * layout, and keyboard bindings.</p>
      */
     public MainFrame() {
         this.commands = new HashMap<>();
@@ -50,25 +83,34 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Configura le proprietà base della finestra
-     * - Titolo
-     * - Dimensioni
-     * - Comportamento alla chiusura
-     * - Posizione centrata sullo schermo
+     * Configures the basic properties of the main window.
+     *
+     * <p>Sets up:</p>
+     * <ul>
+     *   <li>Window title</li>
+     *   <li>Window dimensions (600×450)</li>
+     *   <li>Close operation (exit application)</li>
+     *   <li>Center position on screen</li>
+     *   <li>Non-resizable state for consistent layout</li>
+     * </ul>
      */
     private void setupFrame() {
         setTitle("Money Calculator");
-        setSize(600, 450); // Slightly taller for swap button
+        setSize(600, 450);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Centra la finestra
-        setResizable(false); // Prevent resizing for cleaner look
+        setLocationRelativeTo(null);
+        setResizable(false);
     }
 
     /**
-     * Crea tutti i componenti dell'interfaccia:
-     * - MoneyDialog: per inserire importo e valuta di partenza
-     * - CurrencyDialog: per scegliere la valuta di destinazione
-     * - MoneyDisplay: per mostrare il risultato della conversione
+     * Creates all UI components used in the application.
+     *
+     * <p>Instantiates:</p>
+     * <ul>
+     *   <li>Money input dialog (amount + source currency)</li>
+     *   <li>Currency selection dialog (target currency)</li>
+     *   <li>Result display panel</li>
+     * </ul>
      */
     private void createComponents() {
         moneyDialog = new SwingMoneyDialog();
@@ -77,52 +119,68 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Organizza i componenti nel layout della finestra
+     * Arranges UI components using a BorderLayout structure.
      *
-     * LAYOUT UTILIZZATO: BorderLayout
-     * - NORTH: Pannello di input (importo e valute)
-     * - CENTER: Pulsanti (convert e swap)
-     * - SOUTH: Display del risultato
+     * <p><strong>Layout Structure:</strong></p>
+     * <pre>
+     * ┌─────────────────────────────┐
+     * │  NORTH: Input Panel         │
+     * │  (Amount + Currencies)      │
+     * ├─────────────────────────────┤
+     * │  CENTER: Button Panel       │
+     * │  (Convert + Swap)           │
+     * ├─────────────────────────────┤
+     * │  SOUTH: Display Panel       │
+     * │  (Conversion Result)        │
+     * └─────────────────────────────┘
+     * </pre>
      */
     private void arrangeComponents() {
         setLayout(new BorderLayout(10, 10));
 
-        // Pannello superiore con i campi di input
+        // Top section: input fields
         add(createInputPanel(), BorderLayout.NORTH);
 
-        // Pannello centrale con i pulsanti
+        // Middle section: action buttons
         add(createButtonPanel(), BorderLayout.CENTER);
 
-        // Pannello inferiore con il display del risultato
+        // Bottom section: result display
         add(moneyDisplay.getPanel(), BorderLayout.SOUTH);
     }
 
     /**
-     * Crea il pannello di input che contiene:
-     * - MoneyDialog (importo + valuta di partenza)
-     * - CurrencyDialog (valuta di destinazione)
+     * Creates the input panel containing money and currency dialogs.
      *
-     * Usa BoxLayout per disporre i componenti verticalmente
+     * <p>Uses a vertical BoxLayout to stack the input components with
+     * appropriate spacing between them.</p>
+     *
+     * @return a configured JPanel with all input components
      */
     private JPanel createInputPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Aggiunge il pannello per inserire l'importo e la valuta di partenza
+        // Add source money input (amount + source currency)
         panel.add(moneyDialog.getPanel());
-        panel.add(Box.createVerticalStrut(10)); // Spazio tra i componenti
+        panel.add(Box.createVerticalStrut(10));
 
-        // Aggiunge il pannello per scegliere la valuta di destinazione
+        // Add target currency selection
         panel.add(currencyDialog.getPanel());
 
         return panel;
     }
 
     /**
-     * Crea il pannello con i pulsanti "Convert" e "Swap"
+     * Creates the button panel with conversion and swap controls.
      *
-     * IMPROVEMENT: Added swap button to quickly reverse currencies
+     * <p><strong>Buttons:</strong></p>
+     * <ul>
+     *   <li><strong>Convert:</strong> Executes the currency conversion</li>
+     *   <li><strong>Swap (⇄):</strong> Reverses source and target currencies</li>
+     * </ul>
+     *
+     * @return a configured JPanel with action buttons
      */
     private JPanel createButtonPanel() {
         JPanel panel = new JPanel();
@@ -133,11 +191,9 @@ public class MainFrame extends JFrame {
         convertButton.setFont(new Font("Arial", Font.BOLD, 16));
         convertButton.setPreferredSize(new Dimension(150, 50));
         convertButton.setToolTipText("Convert currency (Ctrl+Enter)");
-
-        // ActionListener: cosa succede quando si clicca il pulsante
         convertButton.addActionListener(e -> executeConversion());
 
-        // Swap button - IMPROVEMENT
+        // Swap button for reversing currencies
         JButton swapButton = new JButton("⇄ Swap");
         swapButton.setFont(new Font("Arial", Font.BOLD, 14));
         swapButton.setPreferredSize(new Dimension(100, 50));
@@ -151,14 +207,20 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Setup keyboard shortcuts
-     * IMPROVEMENT: Added Ctrl+Enter to trigger conversion
+     * Configures keyboard shortcuts for the application.
+     *
+     * <p><strong>Shortcuts Configured:</strong></p>
+     * <ul>
+     *   <li><kbd>Ctrl+Enter</kbd>: Trigger conversion</li>
+     * </ul>
+     *
+     * <p>Keyboard shortcuts are registered at the root pane level to work
+     * regardless of which component has focus.</p>
      */
     private void setupKeyBindings() {
-        // Get the root pane
         JRootPane rootPane = getRootPane();
 
-        // Ctrl+Enter to convert
+        // Ctrl+Enter to execute conversion
         KeyStroke ctrlEnter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(ctrlEnter, "convert");
         rootPane.getActionMap().put("convert", new AbstractAction() {
@@ -167,21 +229,27 @@ public class MainFrame extends JFrame {
                 executeConversion();
             }
         });
-
-        // Also allow just Enter key when amount field has focus
-        // This is handled in the MoneyDialog
     }
 
     /**
-     * Execute the conversion command
-     * Extracted to a method so it can be called from multiple places
-     * (button click, keyboard shortcut, etc.)
+     * Executes the currency conversion command.
+     *
+     * <p>This method orchestrates the conversion process:</p>
+     * <ol>
+     *   <li>Retrieves the registered "exchange" command</li>
+     *   <li>Executes it asynchronously using {@link SwingWorker}</li>
+     *   <li>Updates UI to show "Converting..." during execution</li>
+     *   <li>Handles any errors that occur during conversion</li>
+     *   <li>Restores button state after completion</li>
+     * </ol>
+     *
+     * <p><strong>Thread Safety:</strong> Uses SwingWorker to execute the command
+     * on a background thread, preventing UI freezing during API calls.</p>
      */
     public void executeConversion() {
         Command command = commands.get("exchange");
         if (command != null) {
-            // SwingWorker esegue il comando in background
-            // evitando di bloccare l'interfaccia grafica
+            // Execute command asynchronously to avoid blocking the UI
             new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() {
@@ -224,8 +292,13 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Swap source and target currencies
-     * IMPROVEMENT: New feature to quickly reverse conversion
+     * Swaps the source and target currencies.
+     *
+     * <p>This convenience feature allows users to quickly reverse the conversion
+     * direction without manually reselecting currencies. The display is cleared
+     * when currencies are swapped.</p>
+     *
+     * <p><strong>Example:</strong> If converting USD → EUR, after swap it becomes EUR → USD</p>
      */
     private void swapCurrencies() {
         try {
@@ -236,7 +309,7 @@ public class MainFrame extends JFrame {
                 moneyDialog.setSelectedCurrency(toCurrency);
                 currencyDialog.setSelectedCurrency(fromCurrency);
 
-                // Clear the display when swapping
+                // Clear previous result when swapping
                 moneyDisplay.clear();
             }
         } catch (Exception e) {
@@ -250,36 +323,60 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Registra un comando con un nome
-     * Esempio: put("exchange", exchangeMoneyCommand)
+     * Registers a command with a specific name.
      *
-     * Questo permette di associare azioni a pulsanti in modo flessibile
+     * <p>Commands are stored in a registry and can be executed by name.
+     * This allows flexible binding of actions to UI events.</p>
+     *
+     * <p><strong>Example:</strong></p>
+     * <pre>{@code
+     * Command exchangeCommand = new ExchangeMoneyCommandAdapter(...);
+     * mainFrame.put("exchange", exchangeCommand);
+     * }</pre>
+     *
+     * @param name the command identifier (e.g., "exchange")
+     * @param command the command implementation to execute
      */
     public void put(String name, Command command) {
         commands.put(name, command);
     }
 
     /**
-     * Inizializza le ComboBox con la lista delle valute disponibili
-     * Viene chiamato dopo aver caricato le valute dalla API
+     * Initializes the currency selection dropdowns with available currencies.
      *
-     * @param currencies Lista di tutte le valute supportate
+     * <p>This method should be called after loading currencies from the API
+     * and before displaying the main window.</p>
+     *
+     * @param currencies the list of all supported currencies
      */
     public void loadCurrencies(List<Currency> currencies) {
         moneyDialog.setCurrencies(currencies);
         currencyDialog.setCurrencies(currencies);
     }
 
-    // Getter per i componenti - necessari per ExchangeMoneyCommand
-
+    /**
+     * Returns the money input dialog component.
+     *
+     * @return the dialog for entering source money
+     */
     public SwingMoneyDialog getMoneyDialog() {
         return moneyDialog;
     }
 
+    /**
+     * Returns the currency selection dialog component.
+     *
+     * @return the dialog for selecting target currency
+     */
     public SwingCurrencyDialog getCurrencyDialog() {
         return currencyDialog;
     }
 
+    /**
+     * Returns the result display component.
+     *
+     * @return the display for showing conversion results
+     */
     public SwingMoneyDisplay getMoneyDisplay() {
         return moneyDisplay;
     }
